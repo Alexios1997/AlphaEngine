@@ -3,7 +3,11 @@ add_executable(${ALPHA_GAME_TARGET_NAME}
 	${CMAKE_CURRENT_SOURCE_DIR}/Shaders
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/GameFramework/AppLayer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/GameFramework/AppLayer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/GameFramework/UILayer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/GameFramework/UILayer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/GameFramework/Main.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/GameFramework/Shaders/
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/GameFramework/Textures/
 )
 
 

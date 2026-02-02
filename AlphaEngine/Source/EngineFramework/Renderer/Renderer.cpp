@@ -1,0 +1,91 @@
+#include "EngineFramework/Renderer/Renderer.h"
+
+namespace Renderer
+{
+	// use std::span because
+	// 1. Flexibility -> A function taking const std::vector<GLfloat>& only works with vectors. 
+	// If you later decide to use a std::array for static geometry or have a raw pointer from a C-style library, 
+	// you would have to rewrite your function or copy data into a new vector just to call it.
+	// 
+	// 2. If you have a giant vector containing 1,000 vertices but only want to upload vertices 50 through 100 to a specific GPU buffer,
+	// std::vector makes this difficult without copying.
+	// With std::span, you can simply pass a subspan
+	// 
+	// 3. Safety and Expressiveness -> Non-Owning Intent: When you see std::span, you immediately know the function is just "looking" 
+	// at the data and will not try to resize or manage the memory.
+
+	void InitializeRenderedObject(GLuint& vertexArrayObject, GLuint& vertexBufferObject, std::span<const GLfloat> vertexPosition)
+	{
+		glGenVertexArrays(1, &vertexArrayObject);
+		// Select the one I specified
+		glBindVertexArray(vertexArrayObject);
+
+		// Start Generating our VBO
+		glGenBuffers(1, &vertexBufferObject);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+		glBufferData(GL_ARRAY_BUFFER, vertexPosition.size_bytes(), vertexPosition.data(), GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		glBindVertexArray(0);
+		glDisableVertexAttribArray(0);
+	}
+
+	GLuint CreateShaderProgram(const std::string& vertexShaderSource, const std::string& fragmentShaderSource)
+	{
+		GLuint programObject = glCreateProgram();
+
+		GLuint myVertexShader = Renderer::CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
+		GLuint myFragmentShader = Renderer::CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+
+		glAttachShader(programObject, myVertexShader);
+		glAttachShader(programObject, myFragmentShader);
+		glLinkProgram(programObject);
+
+		glValidateProgram(programObject);
+
+		return programObject;
+	}
+
+	GLuint CompileShader(GLuint type, const std::string& shaderSource)
+	{
+		GLuint shaderObject;
+
+		if (type == GL_VERTEX_SHADER)
+		{
+			shaderObject = glCreateShader(GL_VERTEX_SHADER);
+		}
+		else if (type == GL_FRAGMENT_SHADER)
+		{
+			shaderObject = glCreateShader(GL_FRAGMENT_SHADER);
+		}
+
+		const char* src = shaderSource.c_str();
+		glShaderSource(shaderObject, 1, &src, nullptr);
+		glCompileShader(shaderObject);
+
+		return shaderObject;
+	}
+
+	void ClearScreen()
+	{
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+
+		glViewport(0, 0, 1920, 1080);
+		glClearColor(1.f, 1.f, 0.f, 1.f);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	}
+
+	void RenderObject(GLuint graphicsPipelineShaderProgram, GLuint vertexBufferObject, GLuint vertexArrayObject)
+	{
+		glUseProgram(graphicsPipelineShaderProgram);
+
+		// Draw now
+
+		glBindVertexArray(vertexArrayObject);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+}
