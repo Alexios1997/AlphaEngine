@@ -29,8 +29,10 @@ namespace AlphaEngine
 		// [this] (The Capture)
 		m_Specification.windowSpec.EventCallback = [this](Event& event) {RaiseEvent(event); };
 
-		m_Window = std::make_shared<Window>(m_Specification.windowSpec);
+		m_Window = std::make_unique<Window>(m_Specification.windowSpec);
 		m_Window->Create();
+
+		m_Renderer = std::make_unique<OpenGLRenderer>();
 
 		m_OrchestratorECS = std::make_unique<ECSOrchestrator>();
 	}
@@ -39,7 +41,7 @@ namespace AlphaEngine
 	{
 		for (auto& layer : m_LayerStack)
 		{
-			layer->OnDetach();
+			layer->OnDetach(*m_OrchestratorECS);
 		}
 
 		m_Window->Destroy();
@@ -70,16 +72,28 @@ namespace AlphaEngine
 			float deltaTime = glm::clamp(currentTime - lastTime, 0.001f, 0.1f);
 			lastTime = currentTime;
 
+			// Here goes Logic and Physics for each layer
 			for (auto& layer : m_LayerStack)
 			{
-				layer->OnUpdate(deltaTime);
+				layer->OnUpdate(*m_OrchestratorECS,deltaTime);
 			}
 
+			// To Check The lifetime of the entities to be added and removed
+			m_OrchestratorECS->UpdateEntitiesLifeTime();
+
+			// We use begin frame outside of the loop
+			// cause we dont want one layer clearing what other layers rendered already.
+			m_Renderer->BeginFrame();
 			for (auto& layer : m_LayerStack)
 			{
-				layer->OnRender();
+				layer->OnRender(*m_OrchestratorECS , *m_Renderer);
 			}
+			// We use end frame outside of the loop
+			// cause If Layer 1 uses "Shader A" and Layer 3 also uses "Shader A", the Renderer can draw them together. 
+			// This prevents the GPU from switching shaders back and forth, which is the #1 performance killer in OpenGL.
+			m_Renderer->EndFrame();
 
+			// swapping buffers, Double buffering (Back and Front)
 			m_Window->Update();
 		}
 	}

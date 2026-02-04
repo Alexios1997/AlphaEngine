@@ -9,6 +9,7 @@
 #include <vector>
 #include <set>
 #include "EngineFramework/ECS/ECS.h"
+#include "EngineFramework/Renderer/OpenGLRenderer.h"
 
 
 namespace AlphaEngine {
@@ -36,7 +37,7 @@ namespace AlphaEngine {
 			// Suppose your AppLayer constructor needs a large string or a complex configuration object. If you just pass it normally, 
 			// C++ might create 2 or 3 expensive copies of that data as it travels from main.cpp into your PushLayer function.
 			m_LayerStack.push_back(std::make_unique<TLayer>(std::forward<Args>(args)...));
-			m_LayerStack.back()->OnAttach(m_OrchestratorECS.get());
+			m_LayerStack.back()->OnAttach(*m_OrchestratorECS);
 		}
 
 		// Helper to find a specific layer by type
@@ -55,10 +56,13 @@ namespace AlphaEngine {
 		static float GetTime();
 
 	private:
-		std::unique_ptr<ECSOrchestrator> m_OrchestratorECS;
 		ApplicationSpecification m_Specification;
-		std::shared_ptr<Window> m_Window;
-		bool m_Running = false;
+
+		std::unique_ptr<ECSOrchestrator> m_OrchestratorECS;
+		std::unique_ptr<IRenderer> m_Renderer;
+		std::unique_ptr<Window> m_Window;
 		std::vector<std::unique_ptr<Layer>> m_LayerStack;
+
+		bool m_Running = false;
 	};
 }

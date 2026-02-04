@@ -1,6 +1,8 @@
-#include "EngineFramework/Renderer/Renderer.h"
+#include "EngineFramework/Renderer/OpenGLRenderer.h"
+#include <algorithm>
+#include <glm/gtc/type_ptr.hpp>
 
-namespace Renderer
+namespace AlphaEngine
 {
 	// use std::span because
 	// 1. Flexibility -> A function taking const std::vector<GLfloat>& only works with vectors. 
@@ -14,6 +16,80 @@ namespace Renderer
 	// 3. Safety and Expressiveness -> Non-Owning Intent: When you see std::span, you immediately know the function is just "looking" 
 	// at the data and will not try to resize or manage the memory.
 
+
+	void AlphaEngine::OpenGLRenderer::BeginFrame()
+	{
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		Logger::Log("Wel nICE");
+		m_DrawQueueRCs.clear();
+	}
+
+	// Decouple the logic from the rendering by fueling commands
+	void OpenGLRenderer::FuelRenderCommands(const RenderCommand& command)
+	{
+		m_DrawQueueRCs.push_back(command);
+	}
+
+	void OpenGLRenderer::EndFrame()
+	{
+
+
+		// TODO: TAKE A BETTER LOOK UNDERSTAND!
+
+		// 1. SORTING: The AAA Optimization Step
+		// We sort by Layer first, then by Shader to minimize state changes.
+		std::sort(m_DrawQueueRCs.begin(), m_DrawQueueRCs.end(), [](const RenderCommand& a, const RenderCommand& b) {
+			if (a.layerID != b.layerID) return a.layerID < b.layerID;
+			if (a.shaderID != b.shaderID) return a.shaderID < b.shaderID;
+			return a.textureID < b.textureID;
+			});
+
+		// 2. STATE CACHING: Prevent redundant OpenGL calls
+		uint32_t activeShader = 0;
+		uint32_t activeVAO = 0;
+		uint32_t activeTexture = 0;
+
+		// 3. THE EXECUTION LOOP
+		for (const auto& cmd : m_DrawQueueRCs) {
+
+			// --- SHADER BINDING ---
+			if (cmd.shaderID != activeShader) {
+				glUseProgram(cmd.shaderID);
+				activeShader = cmd.shaderID;
+				// When shader changes, we might need to set global uniforms (like Projection/View)
+				// UploadGlobalUniforms(cmd.shaderID); 
+			}
+
+			// --- TEXTURE BINDING ---
+			if (cmd.textureID != activeTexture) {
+				glBindTexture(GL_TEXTURE_2D, cmd.textureID);
+				activeTexture = cmd.textureID;
+			}
+
+			// --- VAO BINDING ---
+			if (cmd.vao != activeVAO) {
+				glBindVertexArray(cmd.vao);
+				activeVAO = cmd.vao;
+			}
+
+			// --- UNIFORM UPLOAD (Per-Object) ---
+			// We use the raw matrix from our TransformComponent
+			GLint modelLoc = glGetUniformLocation(cmd.shaderID, "u_Model");
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(cmd.transform));
+
+			// --- THE ACTUAL DRAW CALL ---
+			// We use the indexCount stored in the command
+			glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_INT, nullptr);
+		}
+
+		// 4. CLEANUP (Optional)
+		// Some developers like to unbind at the end to prevent accidental leaks
+		glBindVertexArray(0);
+		glUseProgram(0);
+	}
+
+	/*
 	void InitializeRenderedObject(GLuint& vertexArrayObject, GLuint& vertexBufferObject, std::span<const GLfloat> vertexPosition)
 	{
 		glGenVertexArrays(1, &vertexArrayObject);
@@ -88,4 +164,7 @@ namespace Renderer
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
+	*/
 }
+
+

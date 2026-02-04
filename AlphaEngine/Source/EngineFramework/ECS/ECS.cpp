@@ -28,8 +28,10 @@ namespace AlphaEngine
 		);
 	}
 
-	const std::vector<Entity>& System::GetSystemEntities()
+	const std::vector<Entity>& System::GetSystemEntities() const
 	{
+		Logger::Log("System tracking entities count: " + std::to_string(m_Entities.size()));
+
 		return m_Entities;
 	}
 
@@ -60,6 +62,7 @@ namespace AlphaEngine
 
 	void ECSOrchestrator::AddEntityToSystems(Entity entity)
 	{
+		Logger::Log("hM....................D");
 		const auto entityId = entity.GetId();
 		const auto& entityCompSignature = m_EntityComponentSignature[entityId];
 
@@ -71,6 +74,7 @@ namespace AlphaEngine
 
 			if (isInterested)
 			{
+				
 				system.second->AddEntityToSystem(entity);
 			}
 		}
@@ -84,6 +88,7 @@ namespace AlphaEngine
 		}
 		m_EntitiesToBeAdded.clear();
 
+		// todo: REMOVE ENTITIES that are waiting to be killed
 	}
 }
 

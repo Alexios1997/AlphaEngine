@@ -1,7 +1,10 @@
 #include <glad/gl.h> 
 #include "AppLayer.h"
-#include "EngineFramework/Renderer/Renderer.h"
+#include "EngineFramework/Renderer/IRenderer.h"
 #include "EngineFramework/Logger.h"
+#include "EngineFramework/Components/TransformComponent.h"
+#include "EngineFramework/Components/RendererComponent.h"
+#include "EngineFramework/Systems/RenderSystem.h"
 #include <iostream>
 #include <print>
 
@@ -12,60 +15,107 @@ namespace AlphaEngine
 {
 	AppLayer::AppLayer() : Layer("AppLayer")
 	{
-		gVertexArrayObject = 0;
-		gVertexBufferObject = 0;
-		gGraphicsPipelineShaderProgram = 0;
 	}
 
 	AppLayer::~AppLayer() {}
 
 	// Initialize OpenGL buffers (VAO, VBO, Shaders) here
-	void AppLayer::OnAttach(ECSOrchestrator* currentOrchestratorECS) 
+	void AppLayer::OnAttach(ECSOrchestrator& ecsOrchestrator)
 	{
 
-		Layer::OnAttach(currentOrchestratorECS);
+		Layer::OnAttach(ecsOrchestrator);
+
+		// Add Systems that are needed!
+
+		ecsOrchestrator.AddSystem<RenderSystem>();
 
 		std::cout << "[AppLayer] Attaching:\n";
+		// Testing Purposes 
 
-		// Living on CPU
-		const std::vector<GLfloat> vertexPosition{
-			-0.8f, -0.8f, 0.0f,
-			 0.8f, -0.8f, 0.0f,
-			 0.0f, 0.8f, 0.0f
+		float vertices[] = {
+	-0.5f, -0.5f, 0.0f, // Bottom Left
+	 0.5f, -0.5f, 0.0f, // Bottom Right
+	 0.0f,  0.5f, 0.0f  // Top Center
 		};
 
-		Logger::Log("Created Vertices");
-		Logger::Log("cREATE My entity");
+		uint32_t VAO, VBO;
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
 
-		Entity myFirstEntityTest = currentOrchestratorECS->CreateEntity();
-		Entity mySecondEntityTest = currentOrchestratorECS->CreateEntity();
-		// Start setting thing up on the GPU
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		/*
-		// Generate a Vertext Array
-		glGenVertexArrays(1, &gVertexArrayObject);
-		// Select the one I specified
-		glBindVertexArray(gVertexArrayObject);
-
-		// Start Generating our VBO
-		glGenBuffers(1, &gVertexBufferObject);
-		glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-		glBufferData(GL_ARRAY_BUFFER, vertexPosition.size() * sizeof(GLfloat), vertexPosition.data(), GL_STATIC_DRAW);
-
+		// Define the layout (Location 0 in shader)
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-		glBindVertexArray(0);
-		glDisableVertexAttribArray(0);
-		*/
 
-		////////////////Renderer::InitializeRenderedObject(gVertexArrayObject, gVertexBufferObject, vertexPosition);
+		uint32_t indices[] = { 0, 1, 2 };
 
-		// Creating Graphics Pipeline
-		////////////////gGraphicsPipelineShaderProgram = Renderer::CreateShaderProgram(vertexShaderSource, fragmentShaderSource);
+		uint32_t EBO;
+		glGenBuffers(1, &EBO);
+
+		// 2. Bind EBO to the VAO
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+		// We need an Index Count for our RenderCommand
+		uint32_t myTriangleVAO = VAO;
+		uint32_t myIndexCount = 3;
+
+
+		const char* vertexShaderSource = "#version 330 core\n"
+			"layout (location = 0) in vec3 aPos;\n"
+			"uniform mat4 u_Model;\n"
+			"void main() { gl_Position = u_Model * vec4(aPos, 1.0); }\0";
+
+		const char* fragmentShaderSource = "#version 330 core\n"
+			"out vec4 FragColor;\n"
+			"void main() { FragColor = vec4(1.0, 0.5, 0.2, 1.0); }\0"; // Orange color
+
+		// Standard OpenGL Shader Compilation
+		uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+		glCompileShader(vertexShader);
+
+		uint32_t fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+		glCompileShader(fragmentShader);
+
+		uint32_t myShaderID = glCreateProgram();
+		glAttachShader(myShaderID, vertexShader);
+		glAttachShader(myShaderID, fragmentShader);
+		glLinkProgram(myShaderID);
+
+		// Clean up temporary shaders
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+
+
+		
+
+		auto entity1 = ecsOrchestrator.CreateEntity();
+		auto entity2 = ecsOrchestrator.CreateEntity();
+		
+		ecsOrchestrator.AddComponent<TransformComponent>(entity1, 
+			TransformComponent(glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(1.0f)));
+
+		ecsOrchestrator.AddComponent<RenderComponent>(entity1,
+			RenderComponent(myTriangleVAO, myShaderID, myIndexCount));
+
+
+		ecsOrchestrator.AddComponent<TransformComponent>(entity2,
+			TransformComponent(glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(1.0f)));
+
+		ecsOrchestrator.AddComponent<RenderComponent>(entity2,
+			RenderComponent(myTriangleVAO, myShaderID, myIndexCount));
+
 	}
 
-	void AppLayer::OnDetach() {
+	void AppLayer::OnDetach(ECSOrchestrator& ecsOrchestrator) {
+
+		Layer::OnDetach(ecsOrchestrator);
 		std::cout << "[AppLayer] Detaching: Cleaning up GPU Resources\n";
 		// Crucial: Delete resources from the GPU memory
 		//glDeleteVertexArrays(1, &m_VertexArray);
@@ -74,7 +124,7 @@ namespace AlphaEngine
 	}
 
 	// Update physics, player movement, etc.
-	void AppLayer::OnUpdate(float deltaTime) {
+	void AppLayer::OnUpdate(ECSOrchestrator& ecsOrchestrator,float deltaTime) {
 
 		/*
 		std::cout << "Delta Time: " << deltaTime * 1000.0f << "ms" << std::endl;
@@ -101,10 +151,11 @@ namespace AlphaEngine
 	}
 
 	// Draw objects/world
-	void AppLayer::OnRender()
+	void AppLayer::OnRender(ECSOrchestrator& ecsOrchestrator, IRenderer& currentRenderer)
 	{
-		//Renderer::ClearScreen();
-		//Renderer::RenderObject(gGraphicsPipelineShaderProgram, gVertexBufferObject, gVertexArrayObject);
+		
+		ecsOrchestrator.GetSystem<RenderSystem>().RunSystem(currentRenderer, ecsOrchestrator);
+
 	}
 
 	void AppLayer::OnEvent(AlphaEngine::Event& event)

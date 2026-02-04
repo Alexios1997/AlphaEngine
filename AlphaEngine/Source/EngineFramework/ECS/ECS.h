@@ -27,6 +27,7 @@ namespace AlphaEngine
 	template <typename T>
 	class Component : public IComponent
 	{
+	public:
 		static int GetId()
 		{
 			static auto id = nextId++;
@@ -40,6 +41,7 @@ namespace AlphaEngine
 		uint16_t m_id;
 	public:
 		Entity(uint16_t id) : m_id(id) {};
+		Entity(const Entity& entity) = default;
 		uint16_t GetId() const;
 
 		Entity& operator = (const Entity& other) = default;
@@ -47,6 +49,11 @@ namespace AlphaEngine
 		bool operator != (const Entity& other) const { return m_id == other.m_id; }
 		bool operator > (const Entity& other) const { return m_id > other.m_id; }
 		bool operator < (const Entity& other) const { return m_id < other.m_id; }
+
+		template <typename TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
+		template <typename TComponent> void RemoveComponent();
+		template <typename TComponent> void HasComponent() const;
+		template <typename TComponent> TComponent& GetComponent() const;
 
 	};
 
@@ -63,7 +70,7 @@ namespace AlphaEngine
 
 		void AddEntityToSystem(Entity entity);
 		void RemoveEntityFromSystem(Entity entity);
-		const std::vector<Entity>& GetSystemEntities();
+		const std::vector<Entity>& GetSystemEntities() const;
 		const Signature& GetComponentSignature();
 
 		template <typename T>
@@ -184,13 +191,21 @@ namespace AlphaEngine
 		}
 
 		template<typename T>
-		void HasComponent(Entity entity)
+		void HasComponent(Entity entity) const
 		{
 			const auto componentId = Component<T>::GetId();
 			const auto entityId = entity.GetId();
 			return m_EntityComponentSignature[entityId].test(componentId);
 		}
 
+		template<typename T>
+		T& GetComponent(Entity entity) const
+		{
+			const auto componentId = Component<T>::GetId();
+			const auto entityId = entity.GetId();
+			auto componentPool = std::static_pointer_cast<ComponentPool<T>>(m_ComponentPools[componentId]);
+			return componentPool->Get(entityId);
+		}
 
 		// System Management
 		template <typename T, typename ...TArgs>
@@ -217,7 +232,7 @@ namespace AlphaEngine
 		const T& GetSystem()
 		{
 			auto system = m_Systems.find(std::type_index(typeid(T)));
-			//return *(std::static_pointer_cast<T>(system->second));
+			return *(std::static_pointer_cast<T>(system->second));
 		}
 
 		// Checks the component signature of an entity and add

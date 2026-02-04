@@ -13,7 +13,7 @@ namespace AlphaEngine {
 		uint32_t Width = 1280;
 		uint32_t Height = 720;
 		bool isResizeable = true;
-		bool VSync = true;
+		bool VSync = false;
 
 		// functional pointer!
 		// returns void and takes an Event& as its only argument.
