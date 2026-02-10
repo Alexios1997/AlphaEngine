@@ -13,13 +13,20 @@ namespace AlphaEngine
 		UILayer();
 		virtual ~UILayer() = default;
 
+		// It will be assigned only once 
+		static uint32_t GetStaticType() {
+			static uint32_t typeID = GenerateNewLayerID();
+			return typeID;
+		}
+		virtual uint32_t GetLayerType() const override { return GetStaticType(); }
+
 		// Lifecycle Functions
-		virtual void OnAttach(ECSOrchestrator& ecsOrchestrator) override;
-		virtual void OnDetach(ECSOrchestrator& ecsOrchestrator) override;
+		virtual void OnAttach() override;
+		virtual void OnDetach() override;
 
 		// Loop Methods
-		virtual void OnUpdate(ECSOrchestrator& ecsOrchestrator,float ts) override;
-		virtual void OnRender(ECSOrchestrator& ecsOrchestrator, IRenderer& currentRenderer) override;
+		virtual void OnUpdate(float ts) override;
+		virtual void OnRender() override;
 
 		// Event Handling
 		virtual void OnEvent(AlphaEngine::Event& event) override;

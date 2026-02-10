@@ -1,5 +1,6 @@
 #include "EngineFramework/ECS/ECS.h"
 #include "EngineFramework/Logger.h"
+#include "EngineFramework/Systems/CameraSystem.h"
 
 namespace AlphaEngine
 {
@@ -30,7 +31,7 @@ namespace AlphaEngine
 
 	const std::vector<Entity>& System::GetSystemEntities() const
 	{
-		Logger::Log("System tracking entities count: " + std::to_string(m_Entities.size()));
+		//Logger::Log("System tracking entities count: " + std::to_string(m_Entities.size()) + " for a specific system: ");
 
 		return m_Entities;
 	}
@@ -42,7 +43,7 @@ namespace AlphaEngine
 
 	Entity ECSOrchestrator::CreateEntity()
 	{
-		
+
 		uint16_t entityId;
 		entityId = m_NumEntities++;
 
@@ -52,9 +53,9 @@ namespace AlphaEngine
 		// Make sure the entityComponentSignatures vector can accomadate the new entity
 		if (entityId >= m_EntityComponentSignature.size())
 		{
-			m_EntityComponentSignature.resize(entityId+1);
+			m_EntityComponentSignature.resize(entityId + 1);
 		}
-		
+
 		AlphaEngine::Logger::Log("Entity Created with id = " + std::to_string(entityId));
 
 		return entity;
@@ -62,7 +63,6 @@ namespace AlphaEngine
 
 	void ECSOrchestrator::AddEntityToSystems(Entity entity)
 	{
-		Logger::Log("hM....................D");
 		const auto entityId = entity.GetId();
 		const auto& entityCompSignature = m_EntityComponentSignature[entityId];
 
@@ -74,10 +74,43 @@ namespace AlphaEngine
 
 			if (isInterested)
 			{
-				
+
 				system.second->AddEntityToSystem(entity);
 			}
 		}
+	}
+
+	void ECSOrchestrator::SetPrimaryCamera(Entity entity)
+	{
+		if (!entity.IsValid()) return;
+
+		Logger::Log("Check: ");
+
+		// Signature of The Component itself
+		Signature cameraRequiredSignature;
+		cameraRequiredSignature.set(Component<CameraComponent>::GetId());
+
+		// The Signature of the Entity
+		const auto entityId = entity.GetId();
+		const auto& entityCompSignature = m_EntityComponentSignature[entityId];
+
+		// 3. Compare: Use bitwise AND to see if the camera bit is "on"
+		// This checks: "Does entityCompSignature have the cameraRequiredSignature bit set?"
+		bool hasCamera = (entityCompSignature & cameraRequiredSignature) == cameraRequiredSignature;
+
+		if (hasCamera) {
+			m_PrimaryCamera = entity;
+			Logger::Log("Primary camera set to Entity ID: " + std::to_string(entityId));
+		}
+		else {
+			Logger::Err("Failed to set Primary Camera: Entity lacks CameraComponent bit.");
+		}
+
+	}
+
+	Entity ECSOrchestrator::GetPrimaryCamera() const
+	{
+		return m_PrimaryCamera;
 	}
 
 	void ECSOrchestrator::UpdateEntitiesLifeTime()

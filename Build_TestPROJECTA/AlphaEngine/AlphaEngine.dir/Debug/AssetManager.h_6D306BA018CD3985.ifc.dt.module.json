@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\AssetManager.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\AssetManager.h_6D306BA018CD3985.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\AssetManager.h_6D306BA018CD3985.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\AssetManager.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\AssetManager.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\assetmanager.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

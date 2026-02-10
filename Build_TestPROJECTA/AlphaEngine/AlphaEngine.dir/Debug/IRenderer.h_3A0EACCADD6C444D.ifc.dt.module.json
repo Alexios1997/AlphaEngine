@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\IRenderer.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\IRenderer.h_3A0EACCADD6C444D.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\IRenderer.h_3A0EACCADD6C444D.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\IRenderer.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Renderer\\IRenderer.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\renderer\\irenderer.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaGame.dir\\Debug\\AppLayer.obj",
+            "outputs": [
+                "AlphaGame.dir\\Debug\\AppLayer.h_FA38AF889DC8CB9A.ifc.dt.module.json",
+                "AlphaGame.dir\\Debug\\AppLayer.h_FA38AF889DC8CB9A.ifc.dt.d.json",
+                "AlphaGame.dir\\Debug\\AppLayer.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaGame\\Source\\GameFramework\\AppLayer.h",
+                    "source-path": "e:\\alphaproject\\alphagame\\source\\gameframework\\applayer.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

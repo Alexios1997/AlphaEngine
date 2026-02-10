@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\OpenGLRenderer.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\OpenGLRenderer.h_609E824CC7FCFFFF.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\OpenGLRenderer.h_609E824CC7FCFFFF.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\OpenGLRenderer.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Renderer\\OpenGLRenderer.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\renderer\\openglrenderer.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

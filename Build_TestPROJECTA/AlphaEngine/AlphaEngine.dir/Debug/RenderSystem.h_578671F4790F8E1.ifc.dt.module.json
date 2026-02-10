@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\RenderSystem.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\RenderSystem.h_578671F4790F8E1.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\RenderSystem.h_578671F4790F8E1.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\RenderSystem.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Systems\\RenderSystem.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\systems\\rendersystem.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

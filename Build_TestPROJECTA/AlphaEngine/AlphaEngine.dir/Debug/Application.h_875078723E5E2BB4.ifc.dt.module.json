@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\Application.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\Application.h_875078723E5E2BB4.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\Application.h_875078723E5E2BB4.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\Application.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Application.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\application.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

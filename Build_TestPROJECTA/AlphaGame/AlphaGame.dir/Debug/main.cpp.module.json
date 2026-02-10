@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaGame.dir\\Debug\\Main.obj",
+            "outputs": [
+                "E:\\AlphaProject\\Build_TestPROJECTA\\AlphaGame\\AlphaGame.dir\\Debug\\vc145.pdb",
+                "AlphaGame.dir\\Debug\\"
+            ],
+            "requires": []
+        }
+    ]
+}

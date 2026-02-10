@@ -7,7 +7,9 @@
 #include <unordered_set>
 #include <set>
 #include "EngineFramework/Logger.h"
+#include "EngineFramework/ServiceLocator.h"
 #include <memory>
+#include <cassert>
 
 namespace AlphaEngine
 {
@@ -40,21 +42,21 @@ namespace AlphaEngine
 	private:
 		uint16_t m_id;
 	public:
+		// Using the max value as Null
+		static constexpr uint16_t NullID = 0xFFFF;
+
+		Entity() : m_id(NullID) {};
 		Entity(uint16_t id) : m_id(id) {};
 		Entity(const Entity& entity) = default;
+
 		uint16_t GetId() const;
+		bool IsValid() const { return m_id != NullID; }
 
 		Entity& operator = (const Entity& other) = default;
 		bool operator == (const Entity& other) const { return m_id == other.m_id; }
 		bool operator != (const Entity& other) const { return m_id == other.m_id; }
 		bool operator > (const Entity& other) const { return m_id > other.m_id; }
 		bool operator < (const Entity& other) const { return m_id < other.m_id; }
-
-		template <typename TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
-		template <typename TComponent> void RemoveComponent();
-		template <typename TComponent> void HasComponent() const;
-		template <typename TComponent> TComponent& GetComponent() const;
-
 	};
 
 	// The System processes entities that contain a specific Signature
@@ -103,9 +105,10 @@ namespace AlphaEngine
 		uint16_t GetSize() const { return m_Data.size(); }
 		void Resize(int n) { m_Data.resize(n); }
 		void Clear() { m_Data.clear(); }
-		void Add(T object) { m_Data.push_back(object); }
+		//void Add(T object) { m_Data.push_back(object); }
+		void Add(T&& object) { m_Data.push_back(std::move(object)); }
 		void Set(uint16_t index, T object) { m_Data[index] = object; }
-		T& Get(uint16_t index) { return static_cast<T&>(m_Data[index]); }
+		T& Get(uint16_t index) { assert(index < m_Data.size()); return m_Data[index]; }
 		const T& operator[](const uint16_t index) const { return m_Data[index]; }
 
 	};
@@ -113,7 +116,7 @@ namespace AlphaEngine
 
 
 	// Registry -> Manages creation and destruction of entities, add systems and components
-	class ECSOrchestrator
+	class ECSOrchestrator : public IService
 	{
 	private:
 		uint16_t m_NumEntities = 0;
@@ -122,7 +125,7 @@ namespace AlphaEngine
 		// data for a certain component type
 		// vector index = component type id
 		// pool index = entity id
-		std::vector<std::shared_ptr<IComponentPool>> m_ComponentPools;
+		std::vector<std::unique_ptr<IComponentPool>> m_ComponentPools;
 
 		// Vector of component signatures.
 		// The signature lets us know which components are turned "on" for an entity
@@ -130,16 +133,22 @@ namespace AlphaEngine
 		std::vector<Signature> m_EntityComponentSignature;
 
 		// Map of active systems [index = system typeid]
-		std::unordered_map<std::type_index, std::shared_ptr<System>> m_Systems;
+		// TODO: --------------------> We could potentially use just a vector
+		// where the index is the System ID maybe , Little faster
+		std::unordered_map<std::type_index, std::unique_ptr<System>> m_Systems;
 
 		// Set of entities that are flagged to be added or removed in the next
 		// registry Update()
 		std::set<Entity> m_EntitiesToBeAdded;
 		std::set<Entity> m_EntitiesToBeDestroyed;
 
+		// Primary Camera ---------------> This creates Couple with!
+		Entity m_PrimaryCamera;
+
 	public:
 		ECSOrchestrator() { Logger::Log("Created The Orchestrator"); };
-		~ECSOrchestrator() { Logger::Log("Destroyed The Orchestrator"); };
+		virtual ~ECSOrchestrator() { Logger::Log("Destroyed The Orchestrator"); };
+		virtual void InitService() override { Logger::Log("Initializing Service named : ECS Orchestrator"); };
 
 		// Update processes the entities that are waiting to be added/destroyed
 		void UpdateEntitiesLifeTime();
@@ -157,28 +166,28 @@ namespace AlphaEngine
 			// If not inside the vector
 			if (componentId >= m_ComponentPools.size())
 			{
-				m_ComponentPools.resize(componentId + 1, nullptr);
+				m_ComponentPools.resize(componentId + 1);
 			}
 
 			// If no pools at thta index
 			if (!m_ComponentPools[componentId])
-			{
-				std::shared_ptr<ComponentPool<T>> newComponentPool = std::make_shared<ComponentPool<T>>();
-				m_ComponentPools[componentId] = newComponentPool;
+			{			
+				m_ComponentPools[componentId] = std::make_unique<ComponentPool<T>>();
 			}
 
-			// Fetch the pool either way
-			std::shared_ptr<ComponentPool<T>> currentComponentPool = std::static_pointer_cast<ComponentPool<T>>(m_ComponentPools[componentId]);
+			// Fetch the pool either way,
+			// When just using the pool we can use a raw pointer
+			auto* currentCompPool = static_cast<ComponentPool<T>*>(m_ComponentPools[componentId].get());
 
 			// If entity Id does not exist in that pool
-			if (entityId >= currentComponentPool->GetSize())
+			if (entityId >= currentCompPool->GetSize())
 			{
-				currentComponentPool->Resize(m_NumEntities);
+				currentCompPool->Resize(m_NumEntities);
 			}
 
 			T newComponent(std::forward<TArgs>(args)...);
 
-			currentComponentPool->Set(entityId, newComponent);
+			currentCompPool->Set(entityId, newComponent);
 			m_EntityComponentSignature[entityId].set(componentId);
 		}
 
@@ -203,7 +212,7 @@ namespace AlphaEngine
 		{
 			const auto componentId = Component<T>::GetId();
 			const auto entityId = entity.GetId();
-			auto componentPool = std::static_pointer_cast<ComponentPool<T>>(m_ComponentPools[componentId]);
+			auto* componentPool = static_cast<ComponentPool<T>*>(m_ComponentPools[componentId].get());
 			return componentPool->Get(entityId);
 		}
 
@@ -211,33 +220,40 @@ namespace AlphaEngine
 		template <typename T, typename ...TArgs>
 		void AddSystem(TArgs&& ...args)
 		{
-			std::shared_ptr<T> newSystem(std::make_shared<T>(std::forward<TArgs>(args)...));
-			m_Systems.insert(std::make_pair( std::type_index(typeid(T)), newSystem));
+			// Creating the new System and forwarding the arguments correctly
+			// and then move it to our System data structure by making a pair
+			std::unique_ptr<T> newSystem = std::make_unique<T>(std::forward<TArgs>(args)...);
+			m_Systems.insert(std::make_pair( std::type_index(typeid(T)), std::move(newSystem)));
 		}
 
 		template <typename T>
 		void RemoveSystem()
 		{
-			auto system = m_Systems.find(std::type_index(typeid(T)));
-			m_Systems.erase(system);
+			m_Systems.erase(std::type_index(typeid(T)));
 		}
 
 		template <typename T>
-		const bool HasSystem()
+		bool HasSystem() const
 		{
 			return m_Systems.find(std::type_index(typeid(T))) != m_Systems.end();
 		}
 
 		template <typename T>
-		const T& GetSystem()
+		T& GetSystem() const
 		{
-			auto system = m_Systems.find(std::type_index(typeid(T)));
-			return *(std::static_pointer_cast<T>(system->second));
+			auto it = m_Systems.find(std::type_index(typeid(T)));
+			assert(it != m_Systems.end() && "System does not exist!");
+			return *static_cast<T*>(it->second.get());
 		}
+
 
 		// Checks the component signature of an entity and add
 		// the entity to the systems that are interested in it
 		void AddEntityToSystems(Entity entity);
+
+		// Generic Help functions ---------------> Couples though...
+		void SetPrimaryCamera(Entity entity);
+		Entity GetPrimaryCamera() const;
 
 	};
 }

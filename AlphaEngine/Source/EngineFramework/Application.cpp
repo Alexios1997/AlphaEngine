@@ -1,10 +1,16 @@
-#include "EngineFramework/Application.h"
+
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <assert.h>
 #include <iostream>
 #include <ranges>
-
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include "EngineFramework/Application.h"
+#include "EngineFramework/InputEvents.h"
+#include "EngineFramework/WindowEvents.h"
+#include "EngineFramework/EventBus.h"
+#include "EngineFramework/ServiceLocator.h"
 
 namespace AlphaEngine 
 {
@@ -33,15 +39,23 @@ namespace AlphaEngine
 		m_Window->Create();
 
 		m_Renderer = std::make_unique<OpenGLRenderer>();
+		m_Renderer->OnWindowResize(m_Window->GetWidth(), m_Window->GetHeight());
 
 		m_OrchestratorECS = std::make_unique<ECSOrchestrator>();
+
+		m_Input = std::make_unique<Input>(m_Window->GetHandle());
+
+		// Register them so the rest of the engine can find them
+		ServiceLocator::Provide<IRenderer>(m_Renderer.get());
+		ServiceLocator::Provide<ECSOrchestrator>(m_OrchestratorECS.get());
+		ServiceLocator::Provide<Input>(m_Input.get());
 	}
 
 	Application::~Application()
 	{
 		for (auto& layer : m_LayerStack)
 		{
-			layer->OnDetach(*m_OrchestratorECS);
+			layer->OnDetach();
 		}
 
 		m_Window->Destroy();
@@ -55,6 +69,7 @@ namespace AlphaEngine
 		m_Running = true;
 
 		float lastTime = GetTime();
+
 
 		// Main App loop
 		while (m_Running)
@@ -72,10 +87,13 @@ namespace AlphaEngine
 			float deltaTime = glm::clamp(currentTime - lastTime, 0.001f, 0.1f);
 			lastTime = currentTime;
 
+			// Updating the bitsets for the current frame
+			ServiceLocator::Get<Input>().UpdateState();
+
 			// Here goes Logic and Physics for each layer
 			for (auto& layer : m_LayerStack)
 			{
-				layer->OnUpdate(*m_OrchestratorECS,deltaTime);
+				layer->OnUpdate(deltaTime);
 			}
 
 			// To Check The lifetime of the entities to be added and removed
@@ -86,7 +104,7 @@ namespace AlphaEngine
 			m_Renderer->BeginFrame();
 			for (auto& layer : m_LayerStack)
 			{
-				layer->OnRender(*m_OrchestratorECS , *m_Renderer);
+				layer->OnRender();
 			}
 			// We use end frame outside of the loop
 			// cause If Layer 1 uses "Shader A" and Layer 3 also uses "Shader A", the Renderer can draw them together. 
@@ -105,6 +123,17 @@ namespace AlphaEngine
 
 	void Application::RaiseEvent(Event& event)
 	{
+
+		EventDispatcher dispatcher(event);
+
+		dispatcher.Dispatch<AlphaEngine::WindowResizeEvent>([this](AlphaEngine::WindowResizeEvent& event) {
+			m_Renderer->OnWindowResize(event.GetWidth(), event.GetHeight());			
+			return false; // Let other layers see the event too
+		});
+
+		// Broadcast this event ! 
+		EventBus::Publish(event);
+
 		// Checking in reverse the layers to apply the Event Blocking
 		// Uses a "Short-circuit" mechanism
 		// Top-most UI gets event first

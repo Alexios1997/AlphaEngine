@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaGame.dir\\Debug\\AppLayer.obj",
+            "outputs": [
+                "AlphaGame.dir\\Debug\\AppLayer.cpp.ifc.dt.module.json",
+                "AlphaGame.dir\\Debug\\AppLayer.cpp.ifc.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\Layer.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\Layer.h_33BDCF9A91FD6957.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\Layer.h_33BDCF9A91FD6957.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\Layer.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Layer.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\layer.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

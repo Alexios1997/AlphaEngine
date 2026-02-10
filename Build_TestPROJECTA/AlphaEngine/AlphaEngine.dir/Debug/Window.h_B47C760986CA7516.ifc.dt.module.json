@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\Window.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\Window.h_B47C760986CA7516.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\Window.h_B47C760986CA7516.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\Window.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Window.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\window.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

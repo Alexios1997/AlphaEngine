@@ -1,0 +1,10 @@
+^E:\ALPHAPROJECT\BUILD_TESTPROJECTA\CMAKEFILES\8438904DA9C83EEE00B73C667F37D8E8\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SE:/AlphaProject -BE:/AlphaProject/Build_TestPROJECTA --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file E:/AlphaProject/Build_TestPROJECTA/Alpha.slnx
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

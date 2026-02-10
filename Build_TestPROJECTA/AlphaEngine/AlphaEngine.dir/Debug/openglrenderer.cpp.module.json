@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\OpenGLRenderer.obj",
+            "outputs": [
+                "E:\\AlphaProject\\Build_TestPROJECTA\\AlphaEngine\\Debug\\AlphaEngine.pdb",
+                "AlphaEngine.dir\\Debug\\"
+            ],
+            "requires": []
+        }
+    ]
+}

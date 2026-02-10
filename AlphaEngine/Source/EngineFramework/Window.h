@@ -32,6 +32,9 @@ namespace AlphaEngine {
 
 		void RaiseEvent(Event& event);
 
+		uint32_t GetWidth();
+		uint32_t GetHeight();
+
 		
 
 		bool ShouldClose() const;

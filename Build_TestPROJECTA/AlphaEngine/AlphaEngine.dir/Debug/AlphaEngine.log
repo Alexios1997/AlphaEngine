@@ -1,0 +1,16 @@
+﻿  Building Custom Rule E:/AlphaProject/AlphaEngine/CMakeLists.txt
+  Scanning sources for module dependencies...
+  Application.cpp
+  AssetManager.cpp
+  Logger.cpp
+  OpenGLRenderer.cpp
+  ECS.cpp
+  Window.cpp
+  Compiling...
+  AssetManager.cpp
+  Logger.cpp
+  OpenGLRenderer.cpp
+  Application.cpp
+  ECS.cpp
+  Window.cpp
+  AlphaEngine.vcxproj -> E:\AlphaProject\Build_TestPROJECTA\AlphaEngine\Debug\AlphaEngine.lib

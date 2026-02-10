@@ -4,130 +4,140 @@
 #include "EngineFramework/Logger.h"
 #include "EngineFramework/Components/TransformComponent.h"
 #include "EngineFramework/Components/RendererComponent.h"
+#include "EngineFramework/Components/CameraComponent.h"
+#include "EngineFramework/Systems/CameraSystem.h"
 #include "EngineFramework/Systems/RenderSystem.h"
+#include "EngineFramework/Systems/PlayerControllerSystem.h"
+#include "EngineFramework/Systems/MovementSystem.h"
 #include <iostream>
 #include <print>
+#include "EngineFramework/ServiceLocator.h"
+#include "EngineFramework/FileSystem.h"
+#include "EngineFrameWork/Mesh.h"
 
 
 
 
 namespace AlphaEngine
 {
-	AppLayer::AppLayer() : Layer("AppLayer")
+	AppLayer::AppLayer() : Layer("AppLayer"), en1{ 0 }, en2{ 1 }
 	{
 	}
 
 	AppLayer::~AppLayer() {}
 
 	// Initialize OpenGL buffers (VAO, VBO, Shaders) here
-	void AppLayer::OnAttach(ECSOrchestrator& ecsOrchestrator)
+	void AppLayer::OnAttach()
 	{
 
-		Layer::OnAttach(ecsOrchestrator);
+		Layer::OnAttach();
+
+		auto& ecsOrchestrator = ServiceLocator::Get<ECSOrchestrator>();
 
 		// Add Systems that are needed!
 
+
 		ecsOrchestrator.AddSystem<RenderSystem>();
+		ecsOrchestrator.AddSystem<CameraSystem>();
+		ecsOrchestrator.AddSystem<PlayerControllerSystem>();
+		ecsOrchestrator.AddSystem<MovementSystem>();
+
+
 
 		std::cout << "[AppLayer] Attaching:\n";
-		// Testing Purposes 
 
-		float vertices[] = {
-	-0.5f, -0.5f, 0.0f, // Bottom Left
-	 0.5f, -0.5f, 0.0f, // Bottom Right
-	 0.0f,  0.5f, 0.0f  // Top Center
+		// Testing Purposes here
+
+		uint32_t indices[] = {
+			0, 1, 2, 2, 3, 0, // Front
+			1, 5, 6, 6, 2, 1, // Right
+			7, 6, 5, 5, 4, 7, // Back
+			4, 0, 3, 3, 7, 4, // Left
+			3, 2, 6, 6, 7, 3, // Top
+			4, 5, 1, 1, 0, 4  // Bottom
 		};
 
-		uint32_t VAO, VBO;
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
 
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		std::vector<Vertex> meshVertices = {
+			{ {-0.5f, -0.5f,  0.5f} }, { {0.5f, -0.5f,  0.5f} },
+			{ { 0.5f,  0.5f,  0.5f} }, { {-0.5f,  0.5f,  0.5f} },
+			{ {-0.5f, -0.5f, -0.5f} }, { {0.5f, -0.5f, -0.5f} },
+			{ { 0.5f,  0.5f, -0.5f} }, { {-0.5f,  0.5f, -0.5f} }
+		};
 
-		// Define the layout (Location 0 in shader)
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
+		std::vector<uint32_t> meshIndices(indices, indices + sizeof(indices) / sizeof(uint32_t));
 
+		m_CubeMesh = std::make_shared<Mesh>(meshVertices, meshIndices);
 
-		uint32_t indices[] = { 0, 1, 2 };
-
-		uint32_t EBO;
-		glGenBuffers(1, &EBO);
-
-		// 2. Bind EBO to the VAO
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-		// We need an Index Count for our RenderCommand
-		uint32_t myTriangleVAO = VAO;
-		uint32_t myIndexCount = 3;
+		m_BasicShader = std::make_unique<Shader>(
+			FileSystem::GetPath("AlphaGame/Shaders/Basic.glsl")
+		);
 
 
-		const char* vertexShaderSource = "#version 330 core\n"
-			"layout (location = 0) in vec3 aPos;\n"
-			"uniform mat4 u_Model;\n"
-			"void main() { gl_Position = u_Model * vec4(aPos, 1.0); }\0";
-
-		const char* fragmentShaderSource = "#version 330 core\n"
-			"out vec4 FragColor;\n"
-			"void main() { FragColor = vec4(1.0, 0.5, 0.2, 1.0); }\0"; // Orange color
-
-		// Standard OpenGL Shader Compilation
-		uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-		glCompileShader(vertexShader);
-
-		uint32_t fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-		glCompileShader(fragmentShader);
-
-		uint32_t myShaderID = glCreateProgram();
-		glAttachShader(myShaderID, vertexShader);
-		glAttachShader(myShaderID, fragmentShader);
-		glLinkProgram(myShaderID);
-
-		// Clean up temporary shaders
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
+		// To prevet the cube looking like inside-out
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
 
 
-		
+		// Creating Entities just for testing
 
-		auto entity1 = ecsOrchestrator.CreateEntity();
-		auto entity2 = ecsOrchestrator.CreateEntity();
-		
-		ecsOrchestrator.AddComponent<TransformComponent>(entity1, 
-			TransformComponent(glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(1.0f)));
-
-		ecsOrchestrator.AddComponent<RenderComponent>(entity1,
-			RenderComponent(myTriangleVAO, myShaderID, myIndexCount));
+		en1 = ecsOrchestrator.CreateEntity();
+		en2 = ecsOrchestrator.CreateEntity();
+		auto cameraEntity = ecsOrchestrator.CreateEntity();
 
 
-		ecsOrchestrator.AddComponent<TransformComponent>(entity2,
-			TransformComponent(glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(1.0f)));
 
-		ecsOrchestrator.AddComponent<RenderComponent>(entity2,
-			RenderComponent(myTriangleVAO, myShaderID, myIndexCount));
+		// First Entity Cube
+
+		ecsOrchestrator.AddComponent<TransformComponent>(en1,
+			TransformComponent(glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(0.5f)));
+
+		ecsOrchestrator.AddComponent<RenderComponent>(en1,
+			RenderComponent(m_CubeMesh->GetMesh(), m_BasicShader->GetRendererID(), 36));
+
+		ecsOrchestrator.AddComponent<PlayerControllerComponent>(en1,
+			PlayerControllerComponent(5.f, 2.f));
+
+		ecsOrchestrator.AddComponent<VelocityComponent>(en1,
+			VelocityComponent());
+
+
+		// Second Entity Cube
+
+		ecsOrchestrator.AddComponent<TransformComponent>(en2,
+			TransformComponent(glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.5f)));
+
+		ecsOrchestrator.AddComponent<RenderComponent>(en2,
+			RenderComponent(m_CubeMesh->GetMesh(), m_BasicShader->GetRendererID(), 36));
+
+
+		// Camera Entity
+
+		ecsOrchestrator.AddComponent<TransformComponent>(cameraEntity,
+			TransformComponent(glm::vec3(0.f, 0.f, 2.f), glm::vec3(1.f))
+		);
+
+		ecsOrchestrator.AddComponent<CameraComponent>(cameraEntity,
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f)
+		);
+
+		ecsOrchestrator.SetPrimaryCamera(cameraEntity);
 
 	}
 
-	void AppLayer::OnDetach(ECSOrchestrator& ecsOrchestrator) {
+	void AppLayer::OnDetach() {
 
-		Layer::OnDetach(ecsOrchestrator);
-		std::cout << "[AppLayer] Detaching: Cleaning up GPU Resources\n";
-		// Crucial: Delete resources from the GPU memory
-		//glDeleteVertexArrays(1, &m_VertexArray);
-		//glDeleteBuffers(1, &m_VertexBuffer);
-		//glDeleteProgram(m_Shader);
+		Layer::OnDetach();
+		std::cout << "[AppLayer] Detaching";
+
 	}
 
 	// Update physics, player movement, etc.
-	void AppLayer::OnUpdate(ECSOrchestrator& ecsOrchestrator,float deltaTime) {
+	void AppLayer::OnUpdate(float deltaTime) {
 
 		/*
-		std::cout << "Delta Time: " << deltaTime * 1000.0f << "ms" << std::endl;
+		//std::cout << "Delta Time: " << deltaTime * 1000.0f << "ms" << std::endl;
 
 		// 1. Add current frame's time to our accumulator
 		m_FPSAccumulator += deltaTime;
@@ -147,13 +157,31 @@ namespace AlphaEngine
 			m_FPSAccumulator = 0.0f;
 			m_FrameCounter = 0;
 		}
-		*/
+		//*/
+		auto& ecsOrchestrator = ServiceLocator::Get<ECSOrchestrator>();
+		auto& input = ServiceLocator::Get<Input>();
+
+		auto& trans1 = ecsOrchestrator.GetComponent<TransformComponent>(en1);
+		auto& trans2 = ecsOrchestrator.GetComponent<TransformComponent>(en2);
+
+		trans1.rotation.y += rotationSpeed * deltaTime;
+
+		// Cube 2 spins on X and Z for a "tumble" effect
+		trans2.rotation.x += rotationSpeed * 0.5f * deltaTime;
+		trans2.rotation.z += rotationSpeed * deltaTime;
+
+		ecsOrchestrator.GetSystem<CameraSystem>().RunSystem(ecsOrchestrator);
+		ecsOrchestrator.GetSystem<PlayerControllerSystem>().RunSystem(ecsOrchestrator, input);
+		ecsOrchestrator.GetSystem<MovementSystem>().RunSystem(ecsOrchestrator, deltaTime);
+
 	}
 
 	// Draw objects/world
-	void AppLayer::OnRender(ECSOrchestrator& ecsOrchestrator, IRenderer& currentRenderer)
+	void AppLayer::OnRender()
 	{
-		
+		auto& ecsOrchestrator = ServiceLocator::Get<ECSOrchestrator>();
+		auto& currentRenderer = ServiceLocator::Get<IRenderer>();
+
 		ecsOrchestrator.GetSystem<RenderSystem>().RunSystem(currentRenderer, ecsOrchestrator);
 
 	}
@@ -163,15 +191,21 @@ namespace AlphaEngine
 		std::cout << event.ToString() << std::endl;
 
 		AlphaEngine::EventDispatcher dispatcher(event);
-		//dispatcher.Dispatch<AlphaEngine::MouseButtonPressedEvent>([this](AlphaEngine::MouseButtonPressedEvent& e) { return OnMouseButtonPressed(e); });
+
+
+
+
 		dispatcher.Dispatch<AlphaEngine::MouseMovedEvent>([this](AlphaEngine::MouseMovedEvent& e) { return OnMouseMoved(e); });
 		dispatcher.Dispatch<AlphaEngine::WindowClosedEvent>([this](AlphaEngine::WindowClosedEvent& e) { return OnWindowClosed(e); });
 	}
+
+
 
 	bool AppLayer::OnMouseMoved(AlphaEngine::MouseMovedEvent& event)
 	{
 		m_MousePosition = { static_cast<float>(event.GetX()), static_cast<float>(event.GetY()) };
 
+		// Returning false means that other layers can also respond if needed
 		return false;
 	}
 
@@ -179,6 +213,7 @@ namespace AlphaEngine
 	{
 		std::cout << "Window Closed!" << std::endl;
 
+		// Returning false means that other layers can also respond if needed
 		return false;
 	}
 }

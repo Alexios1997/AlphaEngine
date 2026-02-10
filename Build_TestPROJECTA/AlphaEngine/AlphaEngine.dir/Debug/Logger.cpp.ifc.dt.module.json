@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\Logger.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\Logger.cpp.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\Logger.cpp.ifc.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}

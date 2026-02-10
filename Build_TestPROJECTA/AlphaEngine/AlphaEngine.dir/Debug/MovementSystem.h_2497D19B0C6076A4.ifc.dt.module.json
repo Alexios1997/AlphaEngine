@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\MovementSystem.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\MovementSystem.h_2497D19B0C6076A4.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\MovementSystem.h_2497D19B0C6076A4.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\MovementSystem.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Systems\\MovementSystem.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\systems\\movementsystem.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

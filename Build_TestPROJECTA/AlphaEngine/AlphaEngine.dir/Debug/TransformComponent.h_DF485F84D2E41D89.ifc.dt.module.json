@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\TransformComponent.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\TransformComponent.h_DF485F84D2E41D89.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\TransformComponent.h_DF485F84D2E41D89.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\TransformComponent.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Components\\TransformComponent.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\components\\transformcomponent.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

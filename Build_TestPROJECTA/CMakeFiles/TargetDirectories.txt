@@ -1,0 +1,10 @@
+E:/AlphaProject/Build_TestPROJECTA/CMakeFiles/glad.dir
+E:/AlphaProject/Build_TestPROJECTA/CMakeFiles/ALL_BUILD.dir
+E:/AlphaProject/Build_TestPROJECTA/CMakeFiles/ZERO_CHECK.dir
+E:/AlphaProject/Build_TestPROJECTA/_deps/glfw-build/CMakeFiles/ALL_BUILD.dir
+E:/AlphaProject/Build_TestPROJECTA/_deps/glfw-build/src/CMakeFiles/glfw.dir
+E:/AlphaProject/Build_TestPROJECTA/_deps/glfw-build/src/CMakeFiles/update_mappings.dir
+E:/AlphaProject/Build_TestPROJECTA/_deps/glm-build/CMakeFiles/ALL_BUILD.dir
+E:/AlphaProject/Build_TestPROJECTA/_deps/glm-build/glm/CMakeFiles/glm.dir
+E:/AlphaProject/Build_TestPROJECTA/AlphaEngine/CMakeFiles/AlphaEngine.dir
+E:/AlphaProject/Build_TestPROJECTA/AlphaGame/CMakeFiles/AlphaGame.dir

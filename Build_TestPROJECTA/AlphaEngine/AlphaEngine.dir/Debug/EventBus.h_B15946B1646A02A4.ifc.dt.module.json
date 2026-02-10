@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\EventBus.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\EventBus.h_B15946B1646A02A4.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\EventBus.h_B15946B1646A02A4.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\EventBus.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\EventBus.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\eventbus.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

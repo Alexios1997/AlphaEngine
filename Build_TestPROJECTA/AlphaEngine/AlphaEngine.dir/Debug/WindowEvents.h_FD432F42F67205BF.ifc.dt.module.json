@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\WindowEvents.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\WindowEvents.h_FD432F42F67205BF.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\WindowEvents.h_FD432F42F67205BF.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\WindowEvents.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\WindowEvents.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\windowevents.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

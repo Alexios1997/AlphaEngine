@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\RendererComponent.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\RendererComponent.h_7513B71D93143860.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\RendererComponent.h_7513B71D93143860.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\RendererComponent.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Components\\RendererComponent.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\components\\renderercomponent.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

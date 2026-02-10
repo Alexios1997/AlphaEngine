@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\ECS.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\ECS.h_B4FCB992F8830B52.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\ECS.h_B4FCB992F8830B52.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\ECS.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\ECS\\ECS.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\ecs\\ecs.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

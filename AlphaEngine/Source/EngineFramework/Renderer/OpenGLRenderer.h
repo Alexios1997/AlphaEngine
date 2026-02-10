@@ -11,11 +11,19 @@ namespace AlphaEngine
 	class OpenGLRenderer : public IRenderer
 	{
 	private:
+		//uint32_t m_CameraUBO;
+		//glm::mat4 m_ProjectionMatrix;
+		glm::mat4 m_ActiveViewProj;
+		uint32_t m_CameraUBO;
 		std::vector<RenderCommand> m_DrawQueueRCs;
 
 	public:
+		OpenGLRenderer();
+		~OpenGLRenderer();
 		void BeginFrame() override;
 		void FuelRenderCommands(const RenderCommand& command) override;
+		void SetViewProjection(const glm::mat4& viewProj) override;
+		void OnWindowResize(uint32_t width, uint32_t height) override;
 		void EndFrame() override;
 	};
 }

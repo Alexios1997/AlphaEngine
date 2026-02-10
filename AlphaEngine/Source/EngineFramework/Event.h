@@ -1,4 +1,6 @@
 #pragma once
+
+
 #include <string>
 #include <functional>
 
@@ -16,7 +18,7 @@ namespace AlphaEngine {
 // Belongs to the Class itself, It allows you to refer to an event type without having an actual event object yet.
 // Belongs to the Object , It identifies what a generic Event& actually is at runtime.
 
-#define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::type; }\
+#define EVENT_CLASS_TYPE(type)  static EventType GetStaticType() { return EventType::type; }\
 								virtual EventType GetEventType() const override { return GetStaticType(); }\
 								virtual const char* GetName() const override { return #type; }
 

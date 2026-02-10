@@ -139,6 +139,16 @@ namespace AlphaEngine
 			m_Specification.EventCallback(event);
 	}
 
+	uint32_t Window::GetWidth()
+	{
+		return m_Specification.Width;
+	}
+
+	uint32_t Window::GetHeight()
+	{
+		return m_Specification.Height;
+	}
+
 	bool Window::ShouldClose() const
 	{
 		return glfwWindowShouldClose(m_Handle) != 0;

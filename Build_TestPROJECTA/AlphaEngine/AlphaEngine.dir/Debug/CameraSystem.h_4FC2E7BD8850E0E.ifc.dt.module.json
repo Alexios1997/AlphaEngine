@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\CameraSystem.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\CameraSystem.h_4FC2E7BD8850E0E.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\CameraSystem.h_4FC2E7BD8850E0E.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\CameraSystem.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Systems\\CameraSystem.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\systems\\camerasystem.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

@@ -59,3 +59,8 @@ add_subdirectory(AlphaGame)
 # Set The startup Project to be your Game
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${ALPHA_GAME_TARGET_NAME})
 
+# Definition needed
+target_compile_definitions(${ALPHA_ENGINE_TARGET_NAME} PUBLIC 
+    ALPHA_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/"
+)
+

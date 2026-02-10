@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\AlphaProject\AlphaGame\Source\GameFramework\AppLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\AlphaProject\AlphaGame\Source\GameFramework\UILayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\AlphaProject\AlphaGame\Source\GameFramework\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\AlphaProject\AlphaGame\Source\GameFramework\AppLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\AlphaProject\AlphaGame\Source\GameFramework\UILayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\AlphaProject\AlphaGame\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="E:\AlphaProject\AlphaGame\Shaders" />
+    <None Include="E:\AlphaProject\AlphaGame\Source\GameFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{7E6BF26B-464E-3C35-9ED6-5023CD57BBC8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{16C09888-8B9A-378C-B24A-EC21DDAFA619}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaGame.dir\\Debug\\UILayer.obj",
+            "outputs": [
+                "AlphaGame.dir\\Debug\\UILayer.h_B2DA1E61658C09C9.ifc.dt.module.json",
+                "AlphaGame.dir\\Debug\\UILayer.h_B2DA1E61658C09C9.ifc.dt.d.json",
+                "AlphaGame.dir\\Debug\\UILayer.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaGame\\Source\\GameFramework\\UILayer.h",
+                    "source-path": "e:\\alphaproject\\alphagame\\source\\gameframework\\uilayer.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

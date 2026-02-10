@@ -1,0 +1,10 @@
+^E:\ALPHAPROJECT\BUILD_TESTPROJECTA\_DEPS\GLM-SRC\GLM\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SE:/AlphaProject -BE:/AlphaProject/Build_TestPROJECTA --check-stamp-file E:/AlphaProject/Build_TestPROJECTA/_deps/glm-build/glm/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

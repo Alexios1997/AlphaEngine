@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\OpenGLRenderer.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\OpenGLRenderer.cpp.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\OpenGLRenderer.cpp.ifc.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+	"InstallScripts" : 
+	[
+		"E:/AlphaProject/Build_TestPROJECTA/cmake_install.cmake",
+		"E:/AlphaProject/Build_TestPROJECTA/_deps/glfw-build/cmake_install.cmake",
+		"E:/AlphaProject/Build_TestPROJECTA/_deps/glfw-build/src/cmake_install.cmake",
+		"E:/AlphaProject/Build_TestPROJECTA/_deps/glm-build/cmake_install.cmake",
+		"E:/AlphaProject/Build_TestPROJECTA/_deps/glm-build/glm/cmake_install.cmake",
+		"E:/AlphaProject/Build_TestPROJECTA/AlphaEngine/cmake_install.cmake",
+		"E:/AlphaProject/Build_TestPROJECTA/AlphaGame/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

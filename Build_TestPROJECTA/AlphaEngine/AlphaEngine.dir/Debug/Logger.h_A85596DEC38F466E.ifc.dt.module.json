@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\Logger.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\Logger.h_A85596DEC38F466E.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\Logger.h_A85596DEC38F466E.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\Logger.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Logger.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\logger.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

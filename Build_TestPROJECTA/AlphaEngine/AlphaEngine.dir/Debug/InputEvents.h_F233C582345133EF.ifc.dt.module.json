@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\InputEvents.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\InputEvents.h_F233C582345133EF.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\InputEvents.h_F233C582345133EF.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\InputEvents.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\InputEvents.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\inputevents.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

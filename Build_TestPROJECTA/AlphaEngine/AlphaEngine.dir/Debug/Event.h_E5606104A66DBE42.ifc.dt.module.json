@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "AlphaEngine.dir\\Debug\\Event.obj",
+            "outputs": [
+                "AlphaEngine.dir\\Debug\\Event.h_E5606104A66DBE42.ifc.dt.module.json",
+                "AlphaEngine.dir\\Debug\\Event.h_E5606104A66DBE42.ifc.dt.d.json",
+                "AlphaEngine.dir\\Debug\\Event.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "E:\\AlphaProject\\AlphaEngine\\Source\\EngineFramework\\Event.h",
+                    "source-path": "e:\\alphaproject\\alphaengine\\source\\engineframework\\event.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}
