@@ -10,6 +10,8 @@
 #include "EngineFramework/ServiceLocator.h"
 #include <memory>
 #include <cassert>
+#include <deque>
+#include <cstdint>
 
 namespace AlphaEngine
 {
@@ -64,14 +66,20 @@ namespace AlphaEngine
 	{
 	private:
 		Signature m_ComponentSignature;
+
 		std::vector<Entity> m_Entities;
 
+		// the index of the vector is the Entity ID
+		// The value at that index is the Position in the m_ENtities array
+		std::vector<int> m_EntityToIndex;
+
 	public:
-		System() = default;
+		System() { m_Entities.reserve(10000);  m_EntityToIndex.resize(10000, -1); };
 		~System() = default;
 
 		void AddEntityToSystem(Entity entity);
 		void RemoveEntityFromSystem(Entity entity);
+		bool HasEntity(Entity entity) const;
 		const std::vector<Entity>& GetSystemEntities() const;
 		const Signature& GetComponentSignature();
 
@@ -88,7 +96,8 @@ namespace AlphaEngine
 	class IComponentPool
 	{
 	public:
-		virtual ~IComponentPool() {}
+		virtual ~IComponentPool() = default;
+		virtual void RemoveEntityFromPool(uint16_t entityId) = 0;
 	};
 
 	// Pool -> just a vector (contiguous data) of objects of type T
@@ -96,21 +105,99 @@ namespace AlphaEngine
 	class ComponentPool : public IComponentPool
 	{
 	private:
+
+		// Problem: 
+		// Index |   0			1			....			500				....			9999
+		// Data  |  [Health] [Health]		empty		 [Health]		   [empty]		  [Health]
+		// We do Dense - Sparse arrays because When our HealthSystem wants to update everyone, 
+		// the CPU has to "jump" from address 0 to address 500, then to address 999. This is a Cache Miss
+		// With Sparse set way:
+		//
+		// <------ The dense array (actualy comp data lives here) -------->
+		// Dense Index |	   0			1			2			
+		// Data		   |  [Health A] 	[Health B] 	[Health C]
+		//
+		// 
+		// <------ The Sparse array (where in the dense array to find that entity's data) -------->
+		// Entity ID	 |	   0			....			500				....			999			
+		// Value		 |     0			-1				1				-1				2
+
+		// The "Dense" array: Tightly packed component data for CPU cache speed
 		std::vector<T> m_Data;
+
+		// Maps Dense Index -> Entity ID (Needed for Swap-and-Pop)
+		std::vector<uint16_t> m_DenseToEntity;
+
+		// The "Sparse" array: Maps Entity ID -> Index in m_Data
+		// We use int because we need -1 to indicate "no component"
+		std::vector<int> m_EntityToIndex;
+
 	public:
-		ComponentPool(uint16_t size = 100) { m_Data.reserve(size); }
+		ComponentPool(uint16_t size = 1000) { m_Data.reserve(size); m_DenseToEntity.reserve(size); }
 		virtual ~ComponentPool() = default;
 
 		bool isEmpty() const { return m_Data.empty(); }
 		uint16_t GetSize() const { return m_Data.size(); }
-		void Resize(int n) { m_Data.resize(n); }
 		void Clear() { m_Data.clear(); }
-		//void Add(T object) { m_Data.push_back(object); }
-		void Add(T&& object) { m_Data.push_back(std::move(object)); }
-		void Set(uint16_t index, T object) { m_Data[index] = object; }
-		T& Get(uint16_t index) { assert(index < m_Data.size()); return m_Data[index]; }
-		const T& operator[](const uint16_t index) const { return m_Data[index]; }
 
+		void AddComp(uint16_t entityId, T Object)
+		{
+			// Grow Sparse array if needed
+			if (entityId >= m_EntityToIndex.size()) {
+				m_EntityToIndex.resize(entityId + 1, -1);
+			}
+
+			// Map entity to the end of the dense array
+			m_EntityToIndex[entityId] = static_cast<int>(m_Data.size());
+
+			// Push data to the end
+			m_Data.push_back(std::move(Object));
+			m_DenseToEntity.push_back(entityId);
+		}
+
+		void RemoveComp(uint16_t entityId)
+		{
+			int indexToRemove = m_EntityToIndex[entityId];
+			int lastIndex = static_cast<int>(m_Data.size()) - 1;
+
+			// Move last element to the hole
+			m_Data[indexToRemove] = std::move(m_Data[lastIndex]);
+
+			// Update mapings
+			uint16_t entityOfLastElement = m_DenseToEntity[lastIndex];
+			m_EntityToIndex[entityOfLastElement] = indexToRemove;
+			m_DenseToEntity[indexToRemove] = entityOfLastElement;
+
+			// Cleanup
+			m_Data.pop_back();
+			m_DenseToEntity.pop_back();
+			m_EntityToIndex[entityId] = -1;
+		}
+
+		void RemoveEntityFromPool(uint16_t entityId) override {
+			// Check if the entity is within range of our sparse array
+			// Check if the value is not -1 (meaning it actually has a component)
+			if (entityId < m_EntityToIndex.size() && m_EntityToIndex[entityId] != -1) {
+				RemoveComp(entityId); // This calls your Swap-and-Pop logic
+			}
+		}
+		T& Get(uint16_t entityId) {
+			assert(entityId < m_EntityToIndex.size() && m_EntityToIndex[entityId] != -1);
+
+
+			int index = m_EntityToIndex[entityId];
+
+
+			return m_Data[index];
+		}
+
+		uint16_t GetCount() const {
+			return static_cast<uint16_t>(m_Data.size());
+		}
+
+		std::vector<T>& GetAllData() {
+			return m_Data;
+		}
 	};
 
 
@@ -139,14 +226,29 @@ namespace AlphaEngine
 
 		// Set of entities that are flagged to be added or removed in the next
 		// registry Update()
-		std::set<Entity> m_EntitiesToBeAdded;
-		std::set<Entity> m_EntitiesToBeDestroyed;
+		// std::set is a tree, which means that every time we call create entity,
+		// the cpu has to allocate a new node and rebalance the tree.
+		// It would be better to use std::vector
+		std::vector<Entity> m_EntitiesToBeAdded;
+		std::vector<Entity> m_EntitiesToBeDestroyed;
+		// Using this data structure so we add here the entities that need to 
+		// be refreshed and not Refresing every time But only once when we have all entities (Deffered
+		std::vector<Entity> m_EntitiesToRefresh;
+
+		// List of free entity ids that were prev removed
+		std::vector<uint16_t> m_FreeIDs;
 
 		// Primary Camera ---------------> This creates Couple with!
 		Entity m_PrimaryCamera;
 
 	public:
-		ECSOrchestrator() { Logger::Log("Created The Orchestrator"); };
+		ECSOrchestrator() { Logger::Log("Created The Orchestrator"); 
+		m_EntitiesToBeAdded.reserve(1000);
+		m_EntitiesToBeDestroyed.reserve(1000);
+		m_EntitiesToRefresh.reserve(1000);
+		m_EntityComponentSignature.reserve(10000);
+		};
+
 		virtual ~ECSOrchestrator() { Logger::Log("Destroyed The Orchestrator"); };
 		virtual void InitService() override { Logger::Log("Initializing Service named : ECS Orchestrator"); };
 
@@ -155,6 +257,7 @@ namespace AlphaEngine
 
 		// Entity Management
 		Entity CreateEntity();
+		void DestroyEntity(Entity entity);
 
 		// Component Management
 		template <typename T, typename ...TArgs>
@@ -171,7 +274,7 @@ namespace AlphaEngine
 
 			// If no pools at thta index
 			if (!m_ComponentPools[componentId])
-			{			
+			{
 				m_ComponentPools[componentId] = std::make_unique<ComponentPool<T>>();
 			}
 
@@ -179,16 +282,13 @@ namespace AlphaEngine
 			// When just using the pool we can use a raw pointer
 			auto* currentCompPool = static_cast<ComponentPool<T>*>(m_ComponentPools[componentId].get());
 
-			// If entity Id does not exist in that pool
-			if (entityId >= currentCompPool->GetSize())
-			{
-				currentCompPool->Resize(m_NumEntities);
-			}
 
 			T newComponent(std::forward<TArgs>(args)...);
 
-			currentCompPool->Set(entityId, newComponent);
+			currentCompPool->AddComp(entityId, std::move(newComponent));
+
 			m_EntityComponentSignature[entityId].set(componentId);
+			m_EntitiesToRefresh.push_back(entity);
 		}
 
 		template<typename T>
@@ -196,11 +296,18 @@ namespace AlphaEngine
 		{
 			const auto componentId = Component<T>::GetId();
 			const auto entityId = entity.GetId();
+
+			if (componentId < m_ComponentPools.size() && m_ComponentPools[componentId]) {
+				auto* pool = static_cast<ComponentPool<T>*>(m_ComponentPools[componentId].get());
+				pool->RemoveComp(entityId);
+			}
+
 			m_EntityComponentSignature[entityId].set(componentId, false);
+			m_EntitiesToRefresh.push_back(entity);
 		}
 
 		template<typename T>
-		void HasComponent(Entity entity) const
+		bool HasComponent(Entity entity) const
 		{
 			const auto componentId = Component<T>::GetId();
 			const auto entityId = entity.GetId();
@@ -223,7 +330,7 @@ namespace AlphaEngine
 			// Creating the new System and forwarding the arguments correctly
 			// and then move it to our System data structure by making a pair
 			std::unique_ptr<T> newSystem = std::make_unique<T>(std::forward<TArgs>(args)...);
-			m_Systems.insert(std::make_pair( std::type_index(typeid(T)), std::move(newSystem)));
+			m_Systems.insert(std::make_pair(std::type_index(typeid(T)), std::move(newSystem)));
 		}
 
 		template <typename T>
@@ -249,7 +356,10 @@ namespace AlphaEngine
 
 		// Checks the component signature of an entity and add
 		// the entity to the systems that are interested in it
+		// Also Remove them
 		void AddEntityToSystems(Entity entity);
+		void RemoveEntityFromSystems(Entity entity);
+		void RefreshEntity(Entity entity);
 
 		// Generic Help functions ---------------> Couples though...
 		void SetPrimaryCamera(Entity entity);

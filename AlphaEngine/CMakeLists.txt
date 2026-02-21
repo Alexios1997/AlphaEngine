@@ -22,6 +22,14 @@ add_library(${ALPHA_ENGINE_TARGET_NAME} STATIC
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Shader.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Shader.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/FileSystem.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/ModelLoader.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/ModelLoader.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Geometry.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Intersection.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Intersection.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/PhysicsLayers.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/MainContactListener.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/GameplayEvents.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Renderer/IRenderer.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Renderer/OpenGLRenderer.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Renderer/OpenGLRenderer.cpp
@@ -32,10 +40,12 @@ add_library(${ALPHA_ENGINE_TARGET_NAME} STATIC
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Components/CameraComponent.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Components/PlayerControllerComponent.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Components/VelocityComponent.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Components/RigidBodyComponent.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Systems/MovementSystem.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Systems/RenderSystem.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Systems/CameraSystem.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Systems/PlayerControllerSystem.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Source/EngineFramework/Systems/PhysicsSystem.h
 )
 
 target_include_directories(${ALPHA_ENGINE_TARGET_NAME} PUBLIC 

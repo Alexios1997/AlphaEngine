@@ -29,6 +29,10 @@ namespace AlphaEngine
 		// Transparent objects : Sorted Back - to - Front so they blend correctly.
 		float depth;
 
+		// skybox vars
+		bool isCubemap = false;
+		glm::mat4 skyboxVP;
+
 		// <--- GPU Handles --->
 		uint32_t vao;
 		uint32_t indexCount;
@@ -44,7 +48,7 @@ namespace AlphaEngine
 		virtual void InitService() override { Logger::Log("Initializing Service named : IRenderer"); };
 		virtual void BeginFrame() = 0;
 		virtual void FuelRenderCommands(const RenderCommand& command) = 0;
-		virtual void SetViewProjection(const glm::mat4& viewProj) = 0;
+		virtual void SetViewProjection(const glm::mat4& viewProj, const glm::mat4& viewMatrix) = 0;
 		virtual void OnWindowResize(uint32_t width, uint32_t height) = 0;
 		virtual void EndFrame() = 0;
 	};

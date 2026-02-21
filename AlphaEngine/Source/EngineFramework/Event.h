@@ -12,7 +12,8 @@ namespace AlphaEngine {
 		None = 0,
 		WindowClose, WindowResize,
 		KeyPressed, KeyReleased,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+		Collision
 	};
 
 // Belongs to the Class itself, It allows you to refer to an event type without having an actual event object yet.

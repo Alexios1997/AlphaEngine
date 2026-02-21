@@ -13,28 +13,15 @@ namespace AlphaEngine
 {
 
 	// Getting the path of our shader, and checking if found
-	Shader::Shader(const std::string& filepath) : m_FilePath(filepath), m_RendererID(0)
+	Shader::Shader(const std::string& vertSrc, const std::string& fragSrc, const std::string& path) : m_FilePath(path), m_RendererID(0)
 	{
-		std::string source = ReadFile(filepath);
-		if (source.empty()) {
-			Logger::Err("Shader file not found: " + filepath);
+		m_RendererID = CreateShader(vertSrc, fragSrc);
+
+		if (m_RendererID == 0) {
+			Logger::Err("Shader Compilation failed: " + path);
 		}
-
-
-		// Differentiate fragment with vertex, So parse the shader
-		ShaderProgramSource shaderSource = ParseShader(source);
-
-		// Compiling and linking the Shader Source
-		m_RendererID = CreateShader(shaderSource.VertexSource, shaderSource.FragmentSource);
-
-		// Just making sure everything is ok
-		if (m_RendererID == 0)
-		{
-			Logger::Err("Shader Compilation failed: " + filepath);
-		}
-		else
-		{
-			Logger::Log("Shader Compiled as it should! : " + filepath + " Renderer ID: " + std::to_string(m_RendererID));
+		else {
+			Logger::Log("Shader Async-Compiled! : " + path + " ID: " + std::to_string(m_RendererID));
 		}
 
 		uint32_t blockIndex = glGetUniformBlockIndex(m_RendererID, "CameraData");
@@ -42,6 +29,7 @@ namespace AlphaEngine
 			glUniformBlockBinding(m_RendererID, blockIndex, 0);
 		}
 
+		PreCacheUniforms();
 	}
 
 	Shader::~Shader() { glDeleteProgram(m_RendererID); }
@@ -91,7 +79,7 @@ namespace AlphaEngine
 			char infoLog[512];
 			glGetProgramInfoLog(programID, 512, NULL, infoLog);
 			Logger::Err("Shader Linking Error: ");
-			
+
 			// Delete Everything
 			glDeleteProgram(programID);
 			glDeleteShader(vs);
@@ -135,6 +123,18 @@ namespace AlphaEngine
 		return specificShaderId;
 	}
 
+	void Shader::PreCacheUniforms()
+	{
+		m_Uniforms.modelLoc = glGetUniformLocation(m_RendererID, "u_Model");
+		m_Uniforms.viewProjLoc = glGetUniformLocation(m_RendererID, "u_ViewProjection");
+		m_Uniforms.textureLoc = glGetUniformLocation(m_RendererID, "u_Texture");
+		m_Uniforms.lightDirLoc = glGetUniformLocation(m_RendererID, "u_LightDir");
+		m_Uniforms.viewPosLoc = glGetUniformLocation(m_RendererID, "u_ViewPos");
+	}
+
+	
+
+	
 	std::string Shader::ReadFile(const std::string& filepath)
 	{
 		std::string result;

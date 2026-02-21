@@ -34,23 +34,36 @@ namespace AlphaEngine
 		// Event Handling 
 		virtual void OnEvent(AlphaEngine::Event& event) override;
 
-		
+		// Testing Funcs
+		void RespawnBall(Entity entity);
 
 	private:
 
 		// Events
 		bool OnMouseMoved(AlphaEngine::MouseMovedEvent& event);
 		bool OnWindowClosed(AlphaEngine::WindowClosedEvent& event);
+		bool OnResize(AlphaEngine::WindowResizeEvent& event);
 
 	private:
 		
-		std::unique_ptr<class Shader> m_BasicShader;
-		std::shared_ptr<class Mesh> m_CubeMesh;
+		void HandleMouseClick();
+
 
 		// Just testing vars
+		std::unique_ptr<class Shader> m_BasicShader;
+		std::shared_ptr<class Mesh> m_CubeMesh;
+		
+		
 		float rotationSpeed = 30.f;
-		Entity en1;
-		Entity en2;
+		Entity monkeyA;
+		Entity monkeyB;
+		Entity sphereA;
+		Entity sphereB;
+		Entity sphereC;
+		Entity sphereD;
+		Entity floor;
+		Entity MiniGolfModel;
+		Entity goalZone;
 
 
 		// Frames Variables
@@ -59,6 +72,7 @@ namespace AlphaEngine
 
 		glm::vec2 m_MousePosition{ 0.0f };
 
-
+		float m_WindowWidth = 1920.0f;
+		float m_WindowHeight = 1080.0f;
 	};
 }

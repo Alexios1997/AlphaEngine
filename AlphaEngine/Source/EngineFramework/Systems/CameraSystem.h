@@ -25,7 +25,7 @@ namespace AlphaEngine
 				EventDispatcher dispatcher(e);
 				dispatcher.Dispatch<WindowResizeEvent>([this](WindowResizeEvent& ev) {
 					this->m_CurrentAspectRatio = (float)ev.GetWidth() / (float)ev.GetHeight();
-					return false; // Let others hear it too
+					return false;
 					});
 				});
 
@@ -48,9 +48,9 @@ namespace AlphaEngine
 				cameraComp.aspect = currentAspect;
 
 				cameraComp.viewMatrix = glm::lookAt(
-					transformComp.position, // Now (0, 0, 5)
-					cameraComp.target,      // (0, 0, 0)
-					cameraComp.up           // (0, 1, 0)
+					transformComp.position, 
+					cameraComp.target,      
+					cameraComp.up           
 				);
 
 				cameraComp.projectionMatrix = glm::perspective(

@@ -11,6 +11,7 @@
 #include "EngineFramework/ECS/ECS.h"
 #include "EngineFramework/Renderer/OpenGLRenderer.h"
 #include "EngineFramework/Input.h"
+#include "EngineFramework/AssetManager.h"
 
 
 namespace AlphaEngine {
@@ -28,7 +29,7 @@ namespace AlphaEngine {
 
 		void Run();
 		void Stop();
-
+		static void InitPhysics();
 		void RaiseEvent(Event& event);
 
 
@@ -68,6 +69,7 @@ namespace AlphaEngine {
 
 		std::unique_ptr<ECSOrchestrator> m_OrchestratorECS;
 		std::unique_ptr<IRenderer> m_Renderer;
+		std::unique_ptr<AssetManager> m_AssetManager;
 		std::unique_ptr<Window> m_Window;
 		std::unique_ptr<Input> m_Input;
 		std::vector<std::unique_ptr<Layer>> m_LayerStack;

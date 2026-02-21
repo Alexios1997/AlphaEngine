@@ -20,7 +20,10 @@ namespace AlphaEngine
 
 		void RunSystem(ECSOrchestrator& ecs, float deltaTime)
 		{
-			for (auto entity : GetSystemEntities()) {
+			for (auto const& entity : GetSystemEntities()) {
+
+				if (!ecs.HasComponent<TransformComponent>(entity)) continue;
+
 				auto& transform = ecs.GetComponent<TransformComponent>(entity);
 				auto& vel = ecs.GetComponent<VelocityComponent>(entity);
 

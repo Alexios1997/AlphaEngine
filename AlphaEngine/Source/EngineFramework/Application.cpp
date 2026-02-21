@@ -1,4 +1,7 @@
-
+#define JPH_HEADER_INCLUDED
+#include <Jolt/Jolt.h>
+#include <Jolt/RegisterTypes.h>
+#include <Jolt/Core//Factory.h>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <assert.h>
@@ -11,6 +14,9 @@
 #include "EngineFramework/WindowEvents.h"
 #include "EngineFramework/EventBus.h"
 #include "EngineFramework/ServiceLocator.h"
+#include <cstdint>
+
+
 
 namespace AlphaEngine 
 {
@@ -25,6 +31,8 @@ namespace AlphaEngine
 	Application::Application(const ApplicationSpecification& specification)
 		: m_Specification(specification)
 	{
+		
+
 		glfwSetErrorCallback(GLFWErrorCallback);
 		glfwInit();
 
@@ -45,10 +53,24 @@ namespace AlphaEngine
 
 		m_Input = std::make_unique<Input>(m_Window->GetHandle());
 
+		m_AssetManager = std::make_unique<AssetManager>();
+
 		// Register them so the rest of the engine can find them
 		ServiceLocator::Provide<IRenderer>(m_Renderer.get());
 		ServiceLocator::Provide<ECSOrchestrator>(m_OrchestratorECS.get());
 		ServiceLocator::Provide<Input>(m_Input.get());
+		ServiceLocator::Provide<AssetManager>(m_AssetManager.get());
+
+		InitPhysics();
+	}
+
+	void Application::InitPhysics()
+	{
+		JPH::RegisterDefaultAllocator();
+		JPH::Factory::sInstance = new JPH::Factory();
+		JPH::RegisterTypes();
+
+		std::cout << "Jolt initialized successfully!" << std::endl;
 	}
 
 	Application::~Application()
@@ -90,14 +112,16 @@ namespace AlphaEngine
 			// Updating the bitsets for the current frame
 			ServiceLocator::Get<Input>().UpdateState();
 
+			ServiceLocator::Get<AssetManager>().UpdateAssetManager();
+
+			// To Check The lifetime of the entities to be added and removed
+			m_OrchestratorECS->UpdateEntitiesLifeTime();
+
 			// Here goes Logic and Physics for each layer
 			for (auto& layer : m_LayerStack)
 			{
 				layer->OnUpdate(deltaTime);
 			}
-
-			// To Check The lifetime of the entities to be added and removed
-			m_OrchestratorECS->UpdateEntitiesLifeTime();
 
 			// We use begin frame outside of the loop
 			// cause we dont want one layer clearing what other layers rendered already.
