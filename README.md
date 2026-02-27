@@ -43,7 +43,7 @@
 
 <br>
 
-## **📦 Dependencies (Automated) **
+## **📦 Dependencies (Automated)**
 
 * GLFW (Windowing & Input)
 * GLM (OpenGL Mathematics)
