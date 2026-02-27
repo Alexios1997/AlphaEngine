@@ -58,7 +58,7 @@
 #### **Steps:**
 
 1. Clone Repo
-2. Create new folder "build" inside the AlphaEngine Folder and navigate to your new created build folder
+2. Create new folder "build" inside the cloned Repo (which has AlphaEngine, AlphaGame, Architecture etc) and navigate to your new created build folder
 3. Open CMD inside your newly created build folder
 4. Write: | **cmake -S .. -B .** |
 
