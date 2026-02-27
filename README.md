@@ -62,7 +62,7 @@
 3. Open CMD inside your newly created build folder
 4. Write: | **cmake -S .. -B .** |
 
-This will create the Alpa.slnx which now you can open and Run it through your IDE (Debug/Release Mode)
+This will create the **Alpha.slnx** which now you can open and Run it through your IDE (Debug/Release Mode)
 
 ## **Enjoy!**
 
